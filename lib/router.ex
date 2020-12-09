@@ -1,24 +1,4 @@
 defmodule Router do
-  @moduledoc """
-  Documentation for `Router`.
-  """
-
-  # @doc """
-  # Hello world.
-
-  # ## Examples
-
-  #     iex> Router.hello()
-  #     :world
-
-  # """
-  # # def hello do
-  # #   :world
-  # # end
-  require Server.Supervisor
-  require Server.Database
-  require JsonLoader
-
   # orders = [
   #   %{"id" => "toto", "key" => 42},
   #   %{"id" => "test", "key" => "42"},
@@ -35,4 +15,13 @@ defmodule Router do
 
   # orders_filter = Server.Database.search(orders, [{"key", 42}, {"key", "42"}, {"key", "Oh yeah"}])
   # IO.inspect(orders_filter)
+  require Server.AccountServer
+  require Server.MyGenericServer
+
+  {:ok, my_account} = Server.AccountServer.start_link(5)
+  Server.MyGenericServer.cast(my_account, {:credit, 5})
+  Server.MyGenericServer.cast(my_account, {:credit, 2})
+  Server.MyGenericServer.cast(my_account, {:debit, 3})
+  amount = Server.MyGenericServer.call(my_account, :get)
+  IO.puts("current credit hold is #{amount}")
 end
