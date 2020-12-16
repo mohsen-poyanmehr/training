@@ -1,6 +1,6 @@
 defmodule Server.Database do
   use GenServer
-
+  # require FSM.SERVER
   ## Client API
 
   def start_link(opts) do
@@ -38,6 +38,9 @@ defmodule Server.Database do
       Server.Database,
       "/home/mohsen/router/orders_dump/orders_chunk0.json"
     )
+
+    IO.puts("initialize the state of #{table}")
+    JsonLoader.initialize_orders(Server.Database)
 
     {:ok, {names, table}}
   end
@@ -102,5 +105,9 @@ defmodule Server.Database do
     Enum.flat_map(criteria, fn x ->
       :ets.lookup(database, x)
     end)
+  end
+
+  def get_orders(database) do
+    :ets.tab2list(database)
   end
 end
