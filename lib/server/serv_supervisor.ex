@@ -12,6 +12,8 @@ defmodule Server.Supervisor do
       {Server.Database, name: Server.Database},
       Plug.Adapters.Cowboy.child_spec(:http, MyRouter, [], port: 8080),
       Plug.Adapters.Cowboy.child_spec(:http, FSMROUTER, [], port: 9090),
+      Plug.Adapters.Cowboy.child_spec(:http, Server.EwebRouter, [], port: 4002),
+      Plug.Adapters.Cowboy.child_spec(:http, EwebRouterMain, [], port: 4003),
       {DynamicSupervisor, strategy: :one_for_one, name: MyDynamicSupervisor}
     ]
 

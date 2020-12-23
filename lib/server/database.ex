@@ -17,7 +17,7 @@ defmodule Server.Database do
   end
 
   def update(server, {name, key, value}) do
-    GenServer.cast(server, {:update, {name, key, value}})
+    GenServer.call(server, {:update, {name, key, value}})
   end
 
   def lookup(server, name) do
@@ -74,7 +74,7 @@ defmodule Server.Database do
   end
 
   @impl true
-  def handle_cast({:update, {name, key, value}}, {names, table}) do
+  def handle_call({:update, {name, key, value}}, _from, {names, table}) do
     # update ETS table
     case lookup(names, name) do
       {:ok, _pid} ->
@@ -84,12 +84,12 @@ defmodule Server.Database do
         updatedMap = Map.put(secondElementIsMap, key, value)
         :ets.insert(names, {name, updatedMap})
         updated = Server.Database.searchTable(names, [name])
-        IO.inspect(updated)
-        {:noreply, {names, table}}
+        # IO.inspect(updated)
+        {:reply, updated, {names, table}}
 
       :error ->
         IO.inspect("element doesn't exist to update it")
-        {:noreply, {names, table}}
+        {:reply, "no_change", {names, table}}
     end
   end
 
